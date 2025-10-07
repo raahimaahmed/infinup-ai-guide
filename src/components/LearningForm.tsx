@@ -77,21 +77,21 @@ export const LearningForm = ({ onSubmit, isLoading }: LearningFormProps) => {
                 <RadioGroupItem value="beginner" id="beginner" />
                 <Label htmlFor="beginner" className="flex-1 cursor-pointer">
                   <div className="font-medium">Beginner</div>
-                  <div className="text-sm text-muted-foreground">Starting from scratch</div>
+                  <div className="text-xs text-muted-foreground/70">Starting from scratch</div>
                 </Label>
               </div>
               <div className="flex items-center space-x-2 border rounded-lg p-4 hover:border-primary transition-colors cursor-pointer">
                 <RadioGroupItem value="intermediate" id="intermediate" />
                 <Label htmlFor="intermediate" className="flex-1 cursor-pointer">
                   <div className="font-medium">Intermediate</div>
-                  <div className="text-sm text-muted-foreground">I know the basics</div>
+                  <div className="text-xs text-muted-foreground/70">I know the basics</div>
                 </Label>
               </div>
               <div className="flex items-center space-x-2 border rounded-lg p-4 hover:border-primary transition-colors cursor-pointer">
                 <RadioGroupItem value="advanced" id="advanced" />
                 <Label htmlFor="advanced" className="flex-1 cursor-pointer">
                   <div className="font-medium">Advanced</div>
-                  <div className="text-sm text-muted-foreground">Deep expertise</div>
+                  <div className="text-xs text-muted-foreground/70">Deep expertise</div>
                 </Label>
               </div>
             </RadioGroup>
