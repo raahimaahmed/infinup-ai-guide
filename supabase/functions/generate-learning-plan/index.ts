@@ -13,50 +13,34 @@ interface RequestBody {
 }
 
 async function checkUrlStatus(url: string): Promise<boolean> {
-  // Whitelist trusted platforms - don't validate these
-  const trustedDomains = [
-    'youtube.com',
-    'youtu.be',
-    'github.com',
-    'coursera.org',
-    'edx.org',
-    'khanacademy.org',
-    'freecodecamp.org',
-    'developer.mozilla.org',
-    'reactjs.org',
-    'stackoverflow.com',
-    'medium.com',
-    'dev.to',
-    'css-tricks.com',
-    'smashingmagazine.com',
-    'docs.google.com',
-  ];
-  
   try {
-    const urlObj = new URL(url);
-    const hostname = urlObj.hostname.replace('www.', '');
-    
-    // Skip validation for trusted domains
-    if (trustedDomains.some(domain => hostname.includes(domain))) {
-      return true;
-    }
-    
-    // Validate other URLs
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // Longer timeout
     
     const response = await fetch(url, {
       method: 'HEAD',
       signal: controller.signal,
       redirect: 'follow',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; ResourceValidator/1.0)',
+      },
     });
     
     clearTimeout(timeoutId);
-    return response.ok;
+    const isValid = response.ok;
+    
+    if (!isValid) {
+      console.log(`❌ Invalid URL (${response.status}): ${url}`);
+    } else {
+      console.log(`✅ Valid URL: ${url}`);
+    }
+    
+    return isValid;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.log(`URL validation failed for ${url}:`, errorMessage);
-    return false;
+    console.log(`⚠️ URL validation failed for ${url}: ${errorMessage}`);
+    // If validation fails due to network issues, include it anyway
+    return true;
   }
 }
 
@@ -120,18 +104,21 @@ serve(async (req) => {
     const userPrompt = `Create a ${weeks}-week study plan for learning "${topic}" at ${level} level, with ${hoursPerWeek} hours per week.
 
 Requirements:
-- Include ${resourceCount} REAL, high-quality resources (videos, courses, articles, interactive platforms)
-- CRITICAL: Only use VERIFIED, ACTIVE URLs from well-known platforms:
-  * YouTube: Use popular channels with many subscribers (freeCodeCamp, Traversy Media, etc.)
-  * Documentation: Official docs (MDN, React docs, etc.)
-  * Courses: Major platforms like Coursera, edX, Khan Academy, freeCodeCamp
-  * Articles: Dev.to, Medium (well-known authors), CSS-Tricks, Smashing Magazine
-- AVOID: Udemy links (often inactive), obscure blogs, paywalled content
-- Double-check that each URL follows standard formats for the platform
+- Include ${resourceCount} REAL, CURRENTLY ACTIVE resources that are verified to exist
+- CRITICAL URL REQUIREMENTS:
+  * YouTube: ONLY use videos from major educational channels that you are 100% certain exist (freeCodeCamp.org, Traversy Media, Programming with Mosh, etc.)
+  * Documentation: Only official documentation sites (docs.python.org, developer.mozilla.org, reactjs.org)
+  * Courses: Only use official course platform pages (coursera.org, edx.org, khanacademy.org, freecodecamp.org)
+  * Articles: Only use major tech publication sites (dev.to, css-tricks.com, smashingmagazine.com)
+- ABSOLUTELY AVOID:
+  * Udemy links (often removed or made private)
+  * Old blog posts or personal websites
+  * Any URL you are not 100% certain is currently active
+  * Paywalled or premium content
 - Organize by week with clear, progressive themes
 - Each resource needs: title, source, URL, estimated time, description
 - Mix content types: videos (🎥), reading (📖), interactive (💻), projects (🛠️)
-- Prioritize FREE and permanently accessible resources
+- Only include resources that are FREE and permanently accessible
 - Ensure the progression builds skills logically
 
 Return ONLY valid JSON in this exact format (no markdown, no code blocks):
