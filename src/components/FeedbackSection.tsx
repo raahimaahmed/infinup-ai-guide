@@ -1,37 +1,68 @@
-import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { MessageSquare } from "lucide-react";
 
 export const FeedbackSection = () => {
-  return (
-    <div className="mt-16 pt-16 border-t border-border">
-      <div className="container max-w-4xl px-4">
-        <Card className="bg-muted/30 p-8 md:p-12 rounded-2xl">
-          <div className="text-center mb-8 space-y-3">
-            <h2 className="text-2xl md:text-3xl font-bold">
-              💬 Help Us Improve
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Share your thoughts and help us build features that matter most to you. Takes 90 seconds.
-            </p>
-          </div>
+  const [isOpen, setIsOpen] = useState(false);
+  const [hasAutoOpened, setHasAutoOpened] = useState(false);
 
-          <div className="flex justify-center">
-            <div className="w-full max-w-[640px]">
-              <iframe 
-                src="https://docs.google.com/forms/d/e/1FAIpQLScSKf4WLrY-mgGLJeTo0g4qjKRIYftjSsFk1UeRQBzecefuIA/viewform?embedded=true" 
-                width="100%" 
-                height="1983" 
-                frameBorder="0" 
-                marginHeight={0} 
-                marginWidth={0}
-                className="rounded-lg animate-fade-in"
-                title="Infinup Feedback Form"
-              >
-                Loading…
-              </iframe>
-            </div>
+  useEffect(() => {
+    // Auto-open after 15 seconds if not already opened
+    const timer = setTimeout(() => {
+      if (!hasAutoOpened) {
+        setIsOpen(true);
+        setHasAutoOpened(true);
+      }
+    }, 15000);
+
+    return () => clearTimeout(timer);
+  }, [hasAutoOpened]);
+
+  return (
+    <>
+      {/* Floating Feedback Button */}
+      <Button
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-6 right-6 rounded-full h-14 px-6 shadow-lg hover:shadow-xl transition-all gap-2 z-50"
+        size="lg"
+      >
+        <MessageSquare className="h-5 w-5" />
+        <span className="hidden sm:inline">Feedback</span>
+      </Button>
+
+      {/* Feedback Dialog */}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-[90vw] md:max-w-[700px] max-h-[90vh] p-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-4">
+            <DialogTitle className="text-2xl">💬 Help Us Improve</DialogTitle>
+            <DialogDescription>
+              Share your thoughts and help us build features that matter most to you. Takes 90 seconds.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="overflow-y-auto max-h-[calc(90vh-120px)] px-6 pb-6">
+            <iframe 
+              src="https://docs.google.com/forms/d/e/1FAIpQLScSKf4WLrY-mgGLJeTo0g4qjKRIYftjSsFk1UeRQBzecefuIA/viewform?embedded=true" 
+              width="100%" 
+              height="1900" 
+              frameBorder="0" 
+              marginHeight={0} 
+              marginWidth={0}
+              className="rounded-lg"
+              title="Infinup Feedback Form"
+            >
+              Loading…
+            </iframe>
           </div>
-        </Card>
-      </div>
-    </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
