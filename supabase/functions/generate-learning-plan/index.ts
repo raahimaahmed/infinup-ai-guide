@@ -12,6 +12,60 @@ interface RequestBody {
   hoursPerWeek: number;
 }
 
+async function checkUrlStatus(url: string): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    
+    const response = await fetch(url, {
+      method: 'HEAD',
+      signal: controller.signal,
+      redirect: 'follow',
+    });
+    
+    clearTimeout(timeoutId);
+    return response.ok; // Returns true for 200-299 status codes
+  } catch (error) {
+    console.log(`URL validation failed for ${url}:`, error.message);
+    return false;
+  }
+}
+
+async function validatePlanUrls(plan: any): Promise<any> {
+  const validatedWeeks = await Promise.all(
+    plan.weeks.map(async (week: any) => {
+      const validatedResources = await Promise.all(
+        week.resources.map(async (resource: any) => {
+          const isValid = await checkUrlStatus(resource.url);
+          if (!isValid) {
+            console.log(`Invalid URL detected: ${resource.url}`);
+          }
+          return {
+            ...resource,
+            urlVerified: isValid,
+          };
+        })
+      );
+      
+      // Filter out resources with invalid URLs
+      const validResources = validatedResources.filter(r => r.urlVerified);
+      
+      return {
+        ...week,
+        resources: validResources.map(r => {
+          const { urlVerified, ...rest } = r;
+          return rest;
+        }),
+      };
+    })
+  );
+  
+  return {
+    ...plan,
+    weeks: validatedWeeks,
+  };
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -38,11 +92,17 @@ serve(async (req) => {
 
 Requirements:
 - Include ${resourceCount} REAL, high-quality resources (videos, courses, articles, interactive platforms)
-- Use ACTUAL URLs that exist (YouTube videos, freeCodeCamp, Coursera, Udemy, etc.)
+- CRITICAL: Only use VERIFIED, ACTIVE URLs from well-known platforms:
+  * YouTube: Use popular channels with many subscribers (freeCodeCamp, Traversy Media, etc.)
+  * Documentation: Official docs (MDN, React docs, etc.)
+  * Courses: Major platforms like Coursera, edX, Khan Academy, freeCodeCamp
+  * Articles: Dev.to, Medium (well-known authors), CSS-Tricks, Smashing Magazine
+- AVOID: Udemy links (often inactive), obscure blogs, paywalled content
+- Double-check that each URL follows standard formats for the platform
 - Organize by week with clear, progressive themes
 - Each resource needs: title, source, URL, estimated time, description
 - Mix content types: videos (🎥), reading (📖), interactive (💻), projects (🛠️)
-- Prioritize free or accessible resources
+- Prioritize FREE and permanently accessible resources
 - Ensure the progression builds skills logically
 
 Return ONLY valid JSON in this exact format (no markdown, no code blocks):
@@ -121,8 +181,13 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks):
 
     console.log('Successfully generated plan with', plan.weeks.length, 'weeks');
 
+    // Validate URLs before returning
+    console.log('Validating resource URLs...');
+    const validatedPlan = await validatePlanUrls(plan);
+    console.log('URL validation complete');
+
     return new Response(
-      JSON.stringify({ plan }),
+      JSON.stringify({ plan: validatedPlan }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
