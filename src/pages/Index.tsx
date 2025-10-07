@@ -7,11 +7,21 @@ import { useToast } from "@/hooks/use-toast";
 import type { GeneratedPlan, StoredPlan } from "@/types/plan";
 
 const STORAGE_KEY = "infinup_plan";
+const SESSION_ID_KEY = "infinup_session_id";
 
 const Index = () => {
   const [plan, setPlan] = useState<Plan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  // Initialize session ID for feedback tracking
+  useEffect(() => {
+    if (!localStorage.getItem(SESSION_ID_KEY)) {
+      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem(SESSION_ID_KEY, sessionId);
+      console.log("Created new session ID:", sessionId);
+    }
+  }, []);
 
   // Load plan from localStorage on mount
   useEffect(() => {

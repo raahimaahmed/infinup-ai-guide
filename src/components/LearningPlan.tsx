@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { WeekSection } from "./WeekSection";
 import { EmailDialog } from "./EmailDialog";
 import { FeedbackSection } from "./FeedbackSection";
+import { FeedbackDialog } from "./FeedbackDialog";
 import { Mail, RotateCcw } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useToast } from "@/hooks/use-toast";
@@ -112,6 +113,7 @@ export const LearningPlan = ({ plan, onToggleResource, onReset }: LearningPlanPr
               <Mail className="h-4 w-4" />
               Email This Plan
             </Button>
+            <FeedbackDialog plan={plan} />
             <Button
               onClick={onReset}
               variant="ghost"
