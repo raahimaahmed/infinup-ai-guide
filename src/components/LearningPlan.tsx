@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WeekSection } from "./WeekSection";
 import { EmailDialog } from "./EmailDialog";
+import { FeedbackSection } from "./FeedbackSection";
 import { Mail, RotateCcw } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useToast } from "@/hooks/use-toast";
@@ -143,6 +144,9 @@ export const LearningPlan = ({ plan, onToggleResource, onReset }: LearningPlanPr
           </div>
         )}
       </div>
+
+      {/* Feedback Section */}
+      <FeedbackSection />
     </div>
   );
 };
