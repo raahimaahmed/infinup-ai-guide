@@ -13,9 +13,37 @@ interface RequestBody {
 }
 
 async function checkUrlStatus(url: string): Promise<boolean> {
+  // Whitelist trusted platforms - don't validate these
+  const trustedDomains = [
+    'youtube.com',
+    'youtu.be',
+    'github.com',
+    'coursera.org',
+    'edx.org',
+    'khanacademy.org',
+    'freecodecamp.org',
+    'developer.mozilla.org',
+    'reactjs.org',
+    'stackoverflow.com',
+    'medium.com',
+    'dev.to',
+    'css-tricks.com',
+    'smashingmagazine.com',
+    'docs.google.com',
+  ];
+  
   try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.replace('www.', '');
+    
+    // Skip validation for trusted domains
+    if (trustedDomains.some(domain => hostname.includes(domain))) {
+      return true;
+    }
+    
+    // Validate other URLs
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
     
     const response = await fetch(url, {
       method: 'HEAD',
@@ -24,7 +52,7 @@ async function checkUrlStatus(url: string): Promise<boolean> {
     });
     
     clearTimeout(timeoutId);
-    return response.ok; // Returns true for 200-299 status codes
+    return response.ok;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.log(`URL validation failed for ${url}:`, errorMessage);
