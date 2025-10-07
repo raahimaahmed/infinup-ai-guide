@@ -14,13 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      plan_feedback: {
+        Row: {
+          completion_percentage: number | null
+          created_at: string | null
+          feedback_text: string | null
+          hours_per_week: number
+          id: string
+          invalid_resources: number | null
+          level: string
+          model_version: string | null
+          overall_rating: number | null
+          plan_generation_time_ms: number | null
+          progression_rating: number | null
+          relevance_rating: number | null
+          resource_quality_rating: number | null
+          resources_completed: number | null
+          temperature: number | null
+          topic: string
+          total_resources: number | null
+          user_session_id: string | null
+          valid_resources: number | null
+          weeks: number
+          what_needs_improvement: string | null
+          what_worked_well: string | null
+        }
+        Insert: {
+          completion_percentage?: number | null
+          created_at?: string | null
+          feedback_text?: string | null
+          hours_per_week: number
+          id?: string
+          invalid_resources?: number | null
+          level: string
+          model_version?: string | null
+          overall_rating?: number | null
+          plan_generation_time_ms?: number | null
+          progression_rating?: number | null
+          relevance_rating?: number | null
+          resource_quality_rating?: number | null
+          resources_completed?: number | null
+          temperature?: number | null
+          topic: string
+          total_resources?: number | null
+          user_session_id?: string | null
+          valid_resources?: number | null
+          weeks: number
+          what_needs_improvement?: string | null
+          what_worked_well?: string | null
+        }
+        Update: {
+          completion_percentage?: number | null
+          created_at?: string | null
+          feedback_text?: string | null
+          hours_per_week?: number
+          id?: string
+          invalid_resources?: number | null
+          level?: string
+          model_version?: string | null
+          overall_rating?: number | null
+          plan_generation_time_ms?: number | null
+          progression_rating?: number | null
+          relevance_rating?: number | null
+          resource_quality_rating?: number | null
+          resources_completed?: number | null
+          temperature?: number | null
+          topic?: string
+          total_resources?: number | null
+          user_session_id?: string | null
+          valid_resources?: number | null
+          weeks?: number
+          what_needs_improvement?: string | null
+          what_worked_well?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      feedback_analytics: {
+        Row: {
+          avg_completion: number | null
+          avg_overall_rating: number | null
+          avg_progression: number | null
+          avg_relevance: number | null
+          avg_resource_quality: number | null
+          avg_url_success_rate: number | null
+          first_feedback: string | null
+          last_feedback: string | null
+          level: string | null
+          topic: string | null
+          total_feedback: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_feedback_insights: {
+        Args: { p_max_rating?: number; p_min_rating?: number; p_topic?: string }
+        Returns: {
+          avg_rating: number
+          common_improvements: string
+          sample_size: number
+          topic: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
