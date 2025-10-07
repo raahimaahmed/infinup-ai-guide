@@ -61,7 +61,7 @@ export const LearningForm = ({ onSubmit, isLoading }: LearningFormProps) => {
               className="h-14 text-lg"
               required
             />
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground/70">
               e.g., Python Programming, Italian Cooking, Digital Marketing
             </p>
           </div>
