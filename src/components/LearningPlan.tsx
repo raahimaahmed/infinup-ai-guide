@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WeekSection } from "./WeekSection";
+import { EmailDialog } from "./EmailDialog";
 import { Mail, RotateCcw } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useToast } from "@/hooks/use-toast";
@@ -36,6 +38,7 @@ interface LearningPlanProps {
 }
 
 export const LearningPlan = ({ plan, onToggleResource, onReset }: LearningPlanProps) => {
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const totalResources = plan.weekData.reduce((acc, week) => acc + week.resources.length, 0);
@@ -75,15 +78,14 @@ export const LearningPlan = ({ plan, onToggleResource, onReset }: LearningPlanPr
     }
   };
 
-  const handleEmailPlan = () => {
-    toast({
-      title: "Email Feature Coming Soon",
-      description: "We'll add this feature in the next version!",
-    });
-  };
-
   return (
     <div className="min-h-screen pb-12">
+      <EmailDialog 
+        plan={plan} 
+        open={emailDialogOpen} 
+        onOpenChange={setEmailDialogOpen} 
+      />
+      
       <div className="container max-w-4xl px-4 py-8 space-y-8">
         {/* Plan Details */}
         <div className="space-y-4">
@@ -102,7 +104,7 @@ export const LearningPlan = ({ plan, onToggleResource, onReset }: LearningPlanPr
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-3">
             <Button
-              onClick={handleEmailPlan}
+              onClick={() => setEmailDialogOpen(true)}
               variant="outline"
               className="gap-2"
             >
