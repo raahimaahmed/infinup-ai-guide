@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ExternalLink, Video, BookOpen, Code, Wrench } from "lucide-react";
+import { ExternalLink, Video, BookOpen, Code, FolderKanban } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface Resource {
@@ -23,7 +23,7 @@ const iconMap = {
   video: Video,
   reading: BookOpen,
   interactive: Code,
-  project: Wrench,
+  project: FolderKanban,
 };
 
 export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
