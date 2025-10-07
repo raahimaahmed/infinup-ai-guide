@@ -1,0 +1,135 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface RequestBody {
+  topic: string;
+  level: string;
+  weeks: number;
+  hoursPerWeek: number;
+}
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { topic, level, weeks, hoursPerWeek } = await req.json() as RequestBody;
+
+    console.log('Generating learning plan for:', { topic, level, weeks, hoursPerWeek });
+
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
+    }
+
+    // Calculate total resources based on time available
+    const totalHours = weeks * hoursPerWeek;
+    const resourceCount = Math.max(10, Math.min(Math.floor(totalHours / 3), 20));
+
+    const systemPrompt = `You are an expert learning path designer. Create comprehensive, realistic study plans using REAL resources that actually exist online.`;
+
+    const userPrompt = `Create a ${weeks}-week study plan for learning "${topic}" at ${level} level, with ${hoursPerWeek} hours per week.
+
+Requirements:
+- Include ${resourceCount} REAL, high-quality resources (videos, courses, articles, interactive platforms)
+- Use ACTUAL URLs that exist (YouTube videos, freeCodeCamp, Coursera, Udemy, etc.)
+- Organize by week with clear, progressive themes
+- Each resource needs: title, source, URL, estimated time, description
+- Mix content types: videos (🎥), reading (📖), interactive (💻), projects (🛠️)
+- Prioritize free or accessible resources
+- Ensure the progression builds skills logically
+
+Return ONLY valid JSON in this exact format (no markdown, no code blocks):
+{
+  "topic": "${topic}",
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "theme": "Foundations and Basics",
+      "resources": [
+        {
+          "id": 1,
+          "type": "video",
+          "title": "Exact title of real resource",
+          "source": "Platform - Creator/Channel",
+          "url": "https://actual-working-url.com",
+          "duration": "2 hours",
+          "description": "Brief description of what this teaches",
+          "completed": false
+        }
+      ]
+    }
+  ]
+}`;
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'Rate limits exceeded. Please try again later.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'Payment required. Please add credits to your workspace.' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      const errorText = await response.text();
+      console.error('AI gateway error:', response.status, errorText);
+      throw new Error('AI gateway error');
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+
+    console.log('Raw AI response:', content);
+
+    // Parse the JSON response, handling potential markdown wrapping
+    let plan;
+    try {
+      // Remove markdown code blocks if present
+      const cleanedContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      plan = JSON.parse(cleanedContent);
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', parseError);
+      console.error('Content was:', content);
+      throw new Error('Failed to parse AI response');
+    }
+
+    console.log('Successfully generated plan with', plan.weeks.length, 'weeks');
+
+    return new Response(
+      JSON.stringify({ plan }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('Error in generate-learning-plan:', error);
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});
