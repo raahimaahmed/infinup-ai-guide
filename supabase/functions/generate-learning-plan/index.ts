@@ -26,7 +26,8 @@ async function checkUrlStatus(url: string): Promise<boolean> {
     clearTimeout(timeoutId);
     return response.ok; // Returns true for 200-299 status codes
   } catch (error) {
-    console.log(`URL validation failed for ${url}:`, error.message);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.log(`URL validation failed for ${url}:`, errorMessage);
     return false;
   }
 }
