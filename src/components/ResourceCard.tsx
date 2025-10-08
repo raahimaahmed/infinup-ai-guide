@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
+<<<<<<< HEAD
 import { ExternalLink, Video, BookOpen, Code, FolderKanban } from "lucide-react";
+=======
+import { Button } from "@/components/ui/button";
+import { ExternalLink, Video, BookOpen, Code, Wrench, Play, X } from "lucide-react";
+>>>>>>> f537945 (feat: Add YouTube iframe embedding to fix bot detection errors)
 import confetti from "canvas-confetti";
+import { getYouTubeVideoInfo, isYouTubeUrl, getYouTubeEmbedProps } from "@/lib/youtube";
 
 interface Resource {
   id: number;
@@ -28,7 +34,12 @@ const iconMap = {
 
 export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
   const [showPlusOne, setShowPlusOne] = useState(false);
+  const [showEmbed, setShowEmbed] = useState(false);
   const Icon = iconMap[resource.type];
+
+  // Check if this is a YouTube video
+  const isYouTube = isYouTubeUrl(resource.url);
+  const youtubeInfo = isYouTube ? getYouTubeVideoInfo(resource.url) : null;
 
   const handleToggle = () => {
     if (!resource.completed) {
@@ -79,6 +90,46 @@ export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
             {resource.description}
           </p>
 
+          {/* YouTube Embed Section */}
+          {isYouTube && youtubeInfo && (
+            <div className="mt-3 space-y-2">
+              {!showEmbed ? (
+                <Button
+                  onClick={() => setShowEmbed(true)}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  <Play className="h-4 w-4" />
+                  Play Video Here
+                </Button>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      🎥 Video Player
+                    </span>
+                    <Button
+                      onClick={() => setShowEmbed(false)}
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="relative w-full aspect-video rounded-lg overflow-hidden border bg-black">
+                    <iframe
+                      {...getYouTubeEmbedProps(youtubeInfo.videoId)}
+                      className="absolute inset-0 w-full h-full"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* External Link */}
           <a
             href={resource.url}
             target="_blank"
@@ -86,7 +137,7 @@ export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
             className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
           >
             <ExternalLink className="h-4 w-4" />
-            {resource.type === "interactive" ? "Start Now" : "View Resource"}
+            {isYouTube ? "Open in YouTube" : resource.type === "interactive" ? "Start Now" : "View Resource"}
           </a>
         </div>
       </div>

@@ -12,6 +12,39 @@ interface RequestBody {
   hoursPerWeek: number;
 }
 
+// YouTube URL utilities for server-side processing
+function extractYouTubeVideoId(url: string): string | null {
+  try {
+    const urlObj = new URL(url);
+
+    if (urlObj.hostname.includes('youtube.com')) {
+      const vParam = urlObj.searchParams.get('v');
+      if (vParam) return vParam;
+
+      const pathMatch = urlObj.pathname.match(/\/(embed|v)\/([^/?]+)/);
+      if (pathMatch) return pathMatch[2];
+    }
+
+    if (urlObj.hostname === 'youtu.be') {
+      const videoId = urlObj.pathname.slice(1).split('/')[0];
+      if (videoId) return videoId;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeYouTubeUrl(url: string): string {
+  const videoId = extractYouTubeVideoId(url);
+  if (videoId) {
+    // Return the standard watch URL (better for client-side detection)
+    return `https://www.youtube.com/watch?v=${videoId}`;
+  }
+  return url;
+}
+
 async function checkUrlStatus(url: string, retries = 2): Promise<{ isValid: boolean; status?: number; error?: string }> {
   // Whitelist of known reliable domains - skip validation for performance
   const trustedDomains = [
@@ -124,15 +157,18 @@ async function validatePlanUrls(plan: any): Promise<any> {
 
       const validatedResources = await Promise.all(
         week.resources.map(async (resource: any) => {
-          const result = await checkUrlStatus(resource.url);
+          // Normalize YouTube URLs first
+          const normalizedUrl = normalizeYouTubeUrl(resource.url);
+          const result = await checkUrlStatus(normalizedUrl);
 
           if (!result.isValid) {
-            console.log(`  ❌ Removing invalid resource: ${resource.title} - ${resource.url}`);
+            console.log(`  ❌ Removing invalid resource: ${resource.title} - ${normalizedUrl}`);
             console.log(`     Reason: ${result.error || `HTTP ${result.status}`}`);
           }
 
           return {
             ...resource,
+            url: normalizedUrl, // Use normalized URL
             urlVerified: result.isValid,
             validationStatus: result.status,
           };
