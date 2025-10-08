@@ -436,11 +436,18 @@ Requirements:
   * Documentation: Only official documentation sites (docs.python.org, developer.mozilla.org, reactjs.org, etc.)
   * Courses: Only official course platform pages (coursera.org, edx.org, khanacademy.org, freecodecamp.org)
   * Articles: Only major tech publications (dev.to, css-tricks.com, smashingmagazine.com, realpython.com)
+  * Interactive: Prefer embeddable platforms (CodePen, CodeSandbox, StackBlitz, Replit, freeCodeCamp)
+  * PDFs: Use official documentation PDFs or Google Drive links when appropriate
 - ABSOLUTELY AVOID:
   * Udemy links (often removed or made private)
   * Old blog posts or personal websites
   * Any URL you are not 100% certain is currently active
   * Paywalled or premium content
+  * Sites that block iframe embedding (Facebook, Twitter, LinkedIn)
+- EMBEDDABLE CONTENT PRIORITY:
+  * Prioritize resources that can be embedded directly in the learning interface
+  * YouTube videos, freeCodeCamp interactive exercises, CodePen demos, PDF documents
+  * This creates a seamless learning experience without leaving the platform
 - Organize by week with clear, progressive themes
 - Each resource needs: title, source, URL, estimated time, description
 - Mix content types: videos, reading, interactive, projects
