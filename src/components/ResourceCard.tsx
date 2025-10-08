@@ -10,6 +10,7 @@ import {
   getEmbedHeight,
   getEmbedLabel
 } from "@/lib/embeddings";
+import { ArticleContent } from "./ArticleContent";
 
 interface Resource {
   id: number;
@@ -103,6 +104,11 @@ export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
           <p className="text-sm text-muted-foreground line-clamp-2">
             {resource.description}
           </p>
+
+          {/* Article Content Extraction (for reading type) */}
+          {resource.type === 'reading' && !canShowEmbed && (
+            <ArticleContent url={resource.url} initialSummary={resource.description} />
+          )}
 
           {/* Universal Embed Section */}
           {canShowEmbed && embedInfo.canEmbed && iframeProps && (

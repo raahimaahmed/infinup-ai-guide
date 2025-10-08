@@ -435,19 +435,21 @@ Requirements:
   * YouTube: ONLY use videos from major educational channels (freeCodeCamp.org, Traversy Media, Programming with Mosh, Corey Schafer, etc.)
   * Documentation: Only official documentation sites (docs.python.org, developer.mozilla.org, reactjs.org, etc.)
   * Courses: Only official course platform pages (coursera.org, edx.org, khanacademy.org, freecodecamp.org)
-  * Articles: Only major tech publications (dev.to, css-tricks.com, smashingmagazine.com, realpython.com)
+  * Articles: Prefer content-rich, extractable articles from major tech publications (dev.to, css-tricks.com, smashingmagazine.com, realpython.com, medium.com)
   * Interactive: Prefer embeddable platforms (CodePen, CodeSandbox, StackBlitz, Replit, freeCodeCamp)
   * PDFs: Use official documentation PDFs or Google Drive links when appropriate
 - ABSOLUTELY AVOID:
   * Udemy links (often removed or made private)
-  * Old blog posts or personal websites
+  * Old blog posts or personal websites (prefer established publishers)
   * Any URL you are not 100% certain is currently active
   * Paywalled or premium content
   * Sites that block iframe embedding (Facebook, Twitter, LinkedIn)
-- EMBEDDABLE CONTENT PRIORITY:
-  * Prioritize resources that can be embedded directly in the learning interface
-  * YouTube videos, freeCodeCamp interactive exercises, CodePen demos, PDF documents
-  * This creates a seamless learning experience without leaving the platform
+- INLINE CONTENT PRIORITY (NEW!):
+  * Prioritize resources with extractable, readable content
+  * Articles will be fetched and displayed inline using Readability.js extraction
+  * Users can read full articles without leaving InfinUp - seamless learning flow
+  * YouTube videos, freeCodeCamp interactive exercises, CodePen demos, PDF documents all embed directly
+  * This creates a complete learning sanctuary where users never need to leave the platform
 - Organize by week with clear, progressive themes
 - Each resource needs: title, source, URL, estimated time, description
 - Mix content types: videos, reading, interactive, projects
