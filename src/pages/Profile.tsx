@@ -160,7 +160,7 @@ const Profile = () => {
       <Header />
       <div className="container max-w-4xl px-4 py-8 space-y-8">
         {/* Profile Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold">My Learning Dashboard</h1>
             <p className="text-muted-foreground">
@@ -169,7 +169,7 @@ const Profile = () => {
           </div>
           <Button
             onClick={() => navigate("/")}
-            className="gap-2 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground border-0 rounded-full px-5 py-2 transition-all duration-300 shadow-sm hover:shadow-md"
+            className="gap-2 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground border-0 rounded-full px-5 py-2 transition-all duration-300 shadow-sm hover:shadow-md w-full sm:w-auto"
           >
             <Home className="h-4 w-4" />
             Homepage
