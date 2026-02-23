@@ -32,7 +32,7 @@ export const Header = ({ progress }: HeaderProps) => {
               <div className="hidden md:block text-sm text-muted-foreground whitespace-nowrap">
                 {progress.completed}/{progress.total} ({percentage}%)
               </div>
-              <div className="w-20 sm:w-32 h-2 bg-muted rounded-full overflow-hidden shrink-0">
+              <div className="w-32 sm:w-48 h-2.5 bg-muted rounded-full overflow-hidden shrink-0">
                 <div
                   className="h-full bg-gradient-primary transition-all duration-500 ease-smooth"
                   style={{ width: `${percentage}%` }}
