@@ -432,8 +432,8 @@ EXAMPLE 2 - JavaScript for Web Development (3 weeks, 8 hours/week):
 Requirements:
 - Include ${resourceCount} REAL, CURRENTLY ACTIVE resources that are verified to exist
 - CRITICAL URL REQUIREMENTS:
-  * YouTube: ONLY use videos from major educational channels (freeCodeCamp.org, Traversy Media, Programming with Mosh, Corey Schafer, etc.)
-  * Documentation: Only official documentation sites (docs.python.org, developer.mozilla.org, reactjs.org, etc.)
+  * YouTube: ONLY use videos from major educational channels (freeCodeCamp.org, Traversy Media, Programming with Mosh, Corey Schafer, The Coding Train, Fireship, etc.)
+  * For ALL video resources, the "title" field MUST include the channel name in parentheses at the end, e.g. "Python Tutorial for Beginners (freeCodeCamp.org)" or "JavaScript Crash Course (Traversy Media)". This is critical because users will search YouTube by this title.
   * Courses: Only official course platform pages (coursera.org, edx.org, khanacademy.org, freecodecamp.org)
   * Articles: Prefer content-rich, extractable articles from major tech publications (dev.to, css-tricks.com, smashingmagazine.com, realpython.com, medium.com)
   * Interactive: Prefer embeddable platforms (CodePen, CodeSandbox, StackBlitz, Replit, freeCodeCamp)
