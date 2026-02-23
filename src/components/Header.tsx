@@ -43,9 +43,15 @@ export const Header = ({ progress }: HeaderProps) => {
 
           {user ? (
             <div className="flex items-center gap-2">
-              <span className="hidden sm:inline text-sm text-muted-foreground truncate max-w-[150px]">
-                {user.email}
-              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/profile")}
+                className="gap-1.5"
+              >
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">My Plans</span>
+              </Button>
               <Button variant="ghost" size="sm" onClick={signOut} className="gap-1.5">
                 <LogOut className="h-4 w-4" />
                 <span className="hidden sm:inline">Sign Out</span>
