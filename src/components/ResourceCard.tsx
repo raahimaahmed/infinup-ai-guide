@@ -112,22 +112,22 @@ export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
             <ArticleContent url={resource.url} initialSummary={resource.description} />
           )}
 
-          {/* YouTube: Show copyable link */}
+          {/* YouTube: Tell user to search for the video */}
           {canShowEmbed && embedInfo.embedType === 'youtube' && (
             <div className="mt-3 p-3 rounded-lg border bg-muted/50 space-y-2">
-              <p className="text-sm font-medium">🎥 Copy this link and paste it in your browser to watch:</p>
+              <p className="text-sm font-medium">🎥 Search for this video on YouTube:</p>
               <div className="flex items-center gap-2">
-                <code className="flex-1 text-sm bg-background px-3 py-2 rounded border truncate select-all">
-                  {resource.url}
+                <code className="flex-1 text-sm bg-background px-3 py-2 rounded border select-all">
+                  {resource.title}
                 </code>
                 <Button
                   variant="outline"
                   size="sm"
                   className="gap-1.5 shrink-0"
                   onClick={() => {
-                    navigator.clipboard.writeText(resource.url);
+                    navigator.clipboard.writeText(resource.title);
                     setCopied(true);
-                    toast.success("Link copied! Paste it in your browser.");
+                    toast.success("Video name copied! Paste it into YouTube search.");
                     setTimeout(() => setCopied(false), 2000);
                   }}
                 >
@@ -135,6 +135,7 @@ export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
                   {copied ? "Copied!" : "Copy"}
                 </Button>
               </div>
+              <p className="text-xs text-muted-foreground">Copy the video name above and paste it into YouTube's search bar</p>
             </div>
           )}
 
@@ -181,19 +182,20 @@ export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
             </div>
           )}
 
-          {/* External Link */}
-          <a
-            href={resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
-          >
-            <ExternalLink className="h-4 w-4" />
-            {embedInfo.embedType === 'youtube' ? 'Open in YouTube' :
-             embedInfo.embedType === 'pdf' ? 'Download PDF' :
-             resource.type === "interactive" ? "Open in New Tab" :
-             "View Resource"}
-          </a>
+          {/* External Link (hide for YouTube videos) */}
+          {!(embedInfo.embedType === 'youtube' && canShowEmbed) && (
+            <a
+              href={resource.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+              {embedInfo.embedType === 'pdf' ? 'Download PDF' :
+               resource.type === "interactive" ? "Open in New Tab" :
+               "View Resource"}
+            </a>
+          )}
         </div>
       </div>
 
