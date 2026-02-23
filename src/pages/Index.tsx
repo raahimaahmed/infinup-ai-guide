@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { LearningForm, FormData } from "@/components/LearningForm";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -6,6 +7,7 @@ import { LearningPlan, Plan } from "@/components/LearningPlan";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
+import { useCredits } from "@/hooks/useCredits";
 import { supabase } from "@/integrations/supabase/client";
 import type { GeneratedPlan, StoredPlan } from "@/types/plan";
 
@@ -17,6 +19,8 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { balance, deductCredit } = useCredits();
+  const navigate = useNavigate();
   const { saveToggle, loadProgress, isLoggedIn } = useProgress(plan?.topic);
 
   // Initialize session ID for feedback tracking
@@ -72,6 +76,17 @@ const Index = () => {
   }, [plan]);
 
   const handleFormSubmit = async (formData: FormData) => {
+    // Credit check for logged-in users
+    if (user && (balance === null || balance <= 0)) {
+      toast({
+        title: "No Credits Remaining",
+        description: "Purchase more credits to generate a learning plan.",
+        variant: "destructive",
+      });
+      navigate("/credits");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -107,8 +122,10 @@ const Index = () => {
 
       setPlan(newPlan);
 
-      // Save to database if logged in
+      // Deduct credit for logged-in users
       if (user) {
+        await deductCredit();
+
         await supabase.from("user_plans").insert([{
           user_id: user.id,
           topic: newPlan.topic,
