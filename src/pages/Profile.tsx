@@ -232,7 +232,7 @@ const Profile = () => {
                   onClick={() => handleOpenPlan(plan)}
                 >
                   <CardContent className="p-5">
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                       <div className="flex-1 space-y-3">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-lg font-semibold">{plan.topic}</h3>
@@ -260,15 +260,15 @@ const Profile = () => {
                         </div>
                       </div>
 
-                      <div className="flex flex-col gap-2 shrink-0">
-                        <Button size="sm" variant="outline" className="gap-1.5">
+                      <div className="flex flex-row sm:flex-col gap-2 shrink-0">
+                        <Button size="sm" variant="outline" className="gap-1.5 flex-1 sm:flex-none">
                           <ArrowRight className="h-4 w-4" />
                           Open
                         </Button>
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="gap-1.5 text-destructive hover:text-destructive"
+                          className="gap-1.5 text-destructive hover:text-destructive flex-1 sm:flex-none"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeletePlan(plan.id, plan.topic);
