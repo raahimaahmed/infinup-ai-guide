@@ -90,17 +90,6 @@ export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
             <span>{resource.source}</span>
             <span>•</span>
             <span>{resource.duration}</span>
-            {embedInfo.embedType && canShowEmbed && (
-              <>
-                <span>•</span>
-                <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                  {embedInfo.embedType === 'youtube' && '🎥'}
-                  {embedInfo.embedType === 'pdf' && '📄'}
-                  {embedInfo.embedType === 'iframe' && '💻'}
-                  Embeddable
-                </span>
-              </>
-            )}
           </div>
 
           <p className="text-sm text-muted-foreground line-clamp-2">
