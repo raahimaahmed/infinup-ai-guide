@@ -160,11 +160,17 @@ const Profile = () => {
       <Header />
       <div className="container max-w-4xl px-4 py-8 space-y-8">
         {/* Profile Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">My Learning Dashboard</h1>
-          <p className="text-muted-foreground">
-            Track your progress across all your learning plans
-          </p>
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold">My Learning Dashboard</h1>
+            <p className="text-muted-foreground">
+              Track your progress across all your learning plans
+            </p>
+          </div>
+          <Button variant="outline" onClick={() => navigate("/")} className="gap-2">
+            <ArrowRight className="h-4 w-4 rotate-180" />
+            Return to Homepage
+          </Button>
         </div>
 
         {/* Stats Overview */}
