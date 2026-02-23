@@ -4,6 +4,8 @@ import { LearningForm, FormData } from "@/components/LearningForm";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { LearningPlan, Plan } from "@/components/LearningPlan";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useProgress } from "@/hooks/useProgress";
 import type { GeneratedPlan, StoredPlan } from "@/types/plan";
 
 const STORAGE_KEY = "infinup_plan";
@@ -13,13 +15,14 @@ const Index = () => {
   const [plan, setPlan] = useState<Plan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { saveToggle, loadProgress, isLoggedIn } = useProgress(plan?.topic);
 
   // Initialize session ID for feedback tracking
   useEffect(() => {
     if (!localStorage.getItem(SESSION_ID_KEY)) {
       const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       localStorage.setItem(SESSION_ID_KEY, sessionId);
-      console.log("Created new session ID:", sessionId);
     }
   }, []);
 
@@ -37,6 +40,29 @@ const Index = () => {
     }
   }, []);
 
+  // Load progress from database when user logs in or plan changes
+  useEffect(() => {
+    if (!isLoggedIn || !plan) return;
+
+    loadProgress().then((completedIds) => {
+      if (completedIds.size === 0) return;
+
+      setPlan((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          weekData: prev.weekData.map((week) => ({
+            ...week,
+            resources: week.resources.map((r) => ({
+              ...r,
+              completed: completedIds.has(r.id) || r.completed,
+            })),
+          })),
+        };
+      });
+    });
+  }, [isLoggedIn, plan?.topic, loadProgress]);
+
   // Save plan to localStorage whenever it changes
   useEffect(() => {
     if (plan) {
@@ -48,7 +74,6 @@ const Index = () => {
     setIsLoading(true);
 
     try {
-      // Call AI API to generate plan
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-learning-plan`,
         {
@@ -66,14 +91,11 @@ const Index = () => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to generate plan");
-      }
+      if (!response.ok) throw new Error("Failed to generate plan");
 
       const data = await response.json();
       const generatedPlan = data.plan as GeneratedPlan;
 
-      // Convert to Plan format with metadata
       const newPlan: Plan = {
         topic: generatedPlan.topic,
         level: formData.level,
@@ -105,7 +127,7 @@ const Index = () => {
     setPlan((prevPlan) => {
       if (!prevPlan) return prevPlan;
 
-      return {
+      const updatedPlan = {
         ...prevPlan,
         weekData: prevPlan.weekData.map((week) =>
           week.weekNumber === weekNumber
@@ -120,6 +142,15 @@ const Index = () => {
             : week
         ),
       };
+
+      // Find the toggled resource to get its new state
+      const toggledWeek = updatedPlan.weekData.find((w) => w.weekNumber === weekNumber);
+      const toggledResource = toggledWeek?.resources.find((r) => r.id === resourceId);
+      if (toggledResource) {
+        saveToggle(resourceId, weekNumber, toggledResource.completed);
+      }
+
+      return updatedPlan;
     });
   };
 
@@ -130,19 +161,15 @@ const Index = () => {
 
   const getProgress = () => {
     if (!plan) return undefined;
-
     const total = plan.weekData.reduce((acc, week) => acc + week.resources.length, 0);
     const completed = plan.weekData.reduce(
       (acc, week) => acc + week.resources.filter((r) => r.completed).length,
       0
     );
-
     return { completed, total };
   };
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+  if (isLoading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen">

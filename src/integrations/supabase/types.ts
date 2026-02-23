@@ -89,6 +89,63 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_progress: {
+        Row: {
+          completed: boolean
+          completed_at: string
+          id: string
+          resource_id: number
+          topic: string
+          user_id: string
+          week_number: number
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string
+          id?: string
+          resource_id: number
+          topic: string
+          user_id: string
+          week_number: number
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string
+          id?: string
+          resource_id?: number
+          topic?: string
+          user_id?: string
+          week_number?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       feedback_analytics: {
