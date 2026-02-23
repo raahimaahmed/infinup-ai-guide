@@ -179,13 +179,19 @@ const Profile = () => {
         {/* Stats Overview */}
         {plans.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card>
+            <Card
+              className="cursor-pointer hover:shadow-md hover:border-primary/30 transition-all"
+              onClick={() => document.getElementById("plans-list")?.scrollIntoView({ behavior: "smooth" })}
+            >
               <CardContent className="pt-6 text-center">
                 <p className="text-3xl font-bold text-primary">{plans.length}</p>
                 <p className="text-sm text-muted-foreground">Learning Plans</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card
+              className="cursor-pointer hover:shadow-md hover:border-secondary/30 transition-all"
+              onClick={() => document.getElementById("plans-list")?.scrollIntoView({ behavior: "smooth" })}
+            >
               <CardContent className="pt-6 text-center">
                 <p className="text-3xl font-bold text-secondary">
                   {plans.reduce((acc, p) => acc + (p.progress?.completed || 0), 0)}
@@ -193,7 +199,10 @@ const Profile = () => {
                 <p className="text-sm text-muted-foreground">Resources Completed</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card
+              className="cursor-pointer hover:shadow-md hover:border-muted-foreground/30 transition-all"
+              onClick={() => document.getElementById("plans-list")?.scrollIntoView({ behavior: "smooth" })}
+            >
               <CardContent className="pt-6 text-center">
                 <p className="text-3xl font-bold">
                   {plans.reduce((acc, p) => acc + (p.progress?.total || 0), 0)}
@@ -205,6 +214,7 @@ const Profile = () => {
         )}
 
         {/* Plans List */}
+        <div id="plans-list" />
         {plans.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent className="space-y-4">
