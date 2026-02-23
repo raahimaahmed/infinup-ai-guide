@@ -18,21 +18,21 @@ export const Header = ({ progress }: HeaderProps) => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4 md:px-6">
-        <div className="flex items-center gap-2">
+      <div className="container flex h-16 items-center justify-between px-4 md:px-6 gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <img src={logo} alt="Infinup.ai" className="h-8 w-auto" />
-          <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent hidden sm:inline">
             InfinUp.ai
           </span>
         </div>
 
         <div className="flex items-center gap-4">
           {progress && (
-            <div className="flex items-center gap-4">
-              <div className="hidden sm:block text-sm text-muted-foreground">
-                Progress: {progress.completed}/{progress.total} ({percentage}%)
+            <div className="flex items-center gap-3">
+              <div className="hidden md:block text-sm text-muted-foreground whitespace-nowrap">
+                {progress.completed}/{progress.total} ({percentage}%)
               </div>
-              <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+              <div className="w-20 sm:w-32 h-2 bg-muted rounded-full overflow-hidden shrink-0">
                 <div
                   className="h-full bg-gradient-primary transition-all duration-500 ease-smooth"
                   style={{ width: `${percentage}%` }}
