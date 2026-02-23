@@ -116,6 +116,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_plans: {
+        Row: {
+          created_at: string
+          hours_per_week: number
+          id: string
+          level: string
+          plan_data: Json
+          topic: string
+          updated_at: string
+          user_id: string
+          weeks: number
+        }
+        Insert: {
+          created_at?: string
+          hours_per_week: number
+          id?: string
+          level: string
+          plan_data: Json
+          topic: string
+          updated_at?: string
+          user_id: string
+          weeks: number
+        }
+        Update: {
+          created_at?: string
+          hours_per_week?: number
+          id?: string
+          level?: string
+          plan_data?: Json
+          topic?: string
+          updated_at?: string
+          user_id?: string
+          weeks?: number
+        }
+        Relationships: []
+      }
       user_progress: {
         Row: {
           completed: boolean

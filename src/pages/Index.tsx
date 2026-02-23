@@ -6,6 +6,7 @@ import { LearningPlan, Plan } from "@/components/LearningPlan";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress } from "@/hooks/useProgress";
+import { supabase } from "@/integrations/supabase/client";
 import type { GeneratedPlan, StoredPlan } from "@/types/plan";
 
 const STORAGE_KEY = "infinup_plan";
@@ -105,6 +106,19 @@ const Index = () => {
       };
 
       setPlan(newPlan);
+
+      // Save to database if logged in
+      if (user) {
+        await supabase.from("user_plans").insert([{
+          user_id: user.id,
+          topic: newPlan.topic,
+          level: newPlan.level,
+          weeks: newPlan.weeks,
+          hours_per_week: newPlan.hoursPerWeek,
+          plan_data: { weeks: newPlan.weekData } as any,
+        }]);
+      }
+
       toast({
         title: "Learning Plan Created!",
         description: "Your personalized learning path is ready.",
