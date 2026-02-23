@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Video, BookOpen, Code, Hammer, Play, X, FileText } from "lucide-react";
+import { ExternalLink, Video, BookOpen, Code, Hammer, Play, X, FileText, Copy, Check } from "lucide-react";
+import { toast } from "sonner";
 import confetti from "canvas-confetti";
 import {
   getEmbedInfo,
@@ -38,6 +39,7 @@ const iconMap = {
 export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
   const [showPlusOne, setShowPlusOne] = useState(false);
   const [showEmbed, setShowEmbed] = useState(false);
+  const [copied, setCopied] = useState(false);
   const Icon = iconMap[resource.type];
 
   // Get embedding information
@@ -110,8 +112,34 @@ export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
             <ArticleContent url={resource.url} initialSummary={resource.description} />
           )}
 
-          {/* Universal Embed Section */}
-          {canShowEmbed && embedInfo.canEmbed && iframeProps && (
+          {/* YouTube: Show copyable link */}
+          {canShowEmbed && embedInfo.embedType === 'youtube' && (
+            <div className="mt-3 p-3 rounded-lg border bg-muted/50 space-y-2">
+              <p className="text-sm font-medium">🎥 Copy this link and paste it in your browser to watch:</p>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 text-sm bg-background px-3 py-2 rounded border truncate select-all">
+                  {resource.url}
+                </code>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 shrink-0"
+                  onClick={() => {
+                    navigator.clipboard.writeText(resource.url);
+                    setCopied(true);
+                    toast.success("Link copied! Paste it in your browser.");
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                >
+                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  {copied ? "Copied!" : "Copy"}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Non-YouTube embeds (PDF, interactive) */}
+          {canShowEmbed && embedInfo.canEmbed && embedInfo.embedType !== 'youtube' && iframeProps && (
             <div className="mt-3 space-y-2">
               {!showEmbed ? (
                 <Button
@@ -121,7 +149,6 @@ export const ResourceCard = ({ resource, onToggle }: ResourceCardProps) => {
                   className="gap-2"
                 >
                   <Play className="h-4 w-4" />
-                  {embedInfo.embedType === 'youtube' && 'Play Video Here'}
                   {embedInfo.embedType === 'pdf' && 'View PDF Here'}
                   {embedInfo.embedType === 'iframe' && 'Open Interactive Content'}
                 </Button>
