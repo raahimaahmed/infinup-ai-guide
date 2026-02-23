@@ -114,7 +114,7 @@ export const LearningPlan = ({ plan, onToggleResource, onReset }: LearningPlanPr
               <Mail className="h-4 w-4" />
               Email This Plan
             </Button>
-            <FeedbackDialog plan={plan} />
+            
             <Button
               onClick={onReset}
               variant="default"
@@ -146,6 +146,11 @@ export const LearningPlan = ({ plan, onToggleResource, onReset }: LearningPlanPr
             </p>
           </div>
         )}
+
+        {/* Feedback */}
+        <div className="flex justify-center pt-4">
+          <FeedbackDialog plan={plan} />
+        </div>
       </div>
 
     
