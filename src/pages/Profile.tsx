@@ -25,6 +25,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const [plans, setPlans] = useState<SavedPlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showResourceDetail, setShowResourceDetail] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -201,13 +202,27 @@ const Profile = () => {
             </Card>
             <Card
               className="cursor-pointer hover:shadow-md hover:border-muted-foreground/30 transition-all"
-              onClick={() => document.getElementById("plans-list")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => setShowResourceDetail((v) => !v)}
             >
               <CardContent className="pt-6 text-center">
-                <p className="text-3xl font-bold">
-                  {plans.reduce((acc, p) => acc + (p.progress?.total || 0), 0)}
-                </p>
-                <p className="text-sm text-muted-foreground">Total Resources</p>
+                {showResourceDetail ? (
+                  <>
+                    <p className="text-3xl font-bold text-secondary">
+                      {plans.reduce((acc, p) => acc + (p.progress?.completed || 0), 0)}
+                      <span className="text-muted-foreground text-lg font-normal">
+                        /{plans.reduce((acc, p) => acc + (p.progress?.total || 0), 0)}
+                      </span>
+                    </p>
+                    <p className="text-sm text-muted-foreground">Completed / Total</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-3xl font-bold">
+                      {plans.reduce((acc, p) => acc + (p.progress?.total || 0), 0)}
+                    </p>
+                    <p className="text-sm text-muted-foreground">Total Resources</p>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>
