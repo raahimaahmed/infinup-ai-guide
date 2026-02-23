@@ -117,7 +117,7 @@ export const LearningPlan = ({ plan, onToggleResource, onReset }: LearningPlanPr
             <FeedbackDialog plan={plan} />
             <Button
               onClick={onReset}
-              variant="ghost"
+              variant="default"
               className="gap-2"
             >
               <RotateCcw className="h-4 w-4" />
