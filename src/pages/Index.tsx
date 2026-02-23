@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
+import { SEOContent } from "@/components/SEOContent";
 import { LearningForm, FormData } from "@/components/LearningForm";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { LearningPlan, Plan } from "@/components/LearningPlan";
@@ -208,7 +209,10 @@ const Index = () => {
       {plan ? (
         <LearningPlan plan={plan} onToggleResource={handleToggleResource} onReset={handleReset} />
       ) : (
-        <LearningForm onSubmit={handleFormSubmit} isLoading={isLoading} />
+        <>
+          <LearningForm onSubmit={handleFormSubmit} isLoading={isLoading} />
+          <SEOContent />
+        </>
       )}
     </div>
   );

@@ -37,13 +37,14 @@ export const LearningForm = ({ onSubmit, isLoading }: LearningFormProps) => {
       <div className="w-full max-w-2xl space-y-8 text-center">
         <div className="space-y-4">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            Learn Anything.{" "}
+            Generate Personalized{" "}
             <span className="bg-gradient-primary bg-clip-text text-transparent">
-              Infinitely Upward.
-            </span>
+              Study Plans
+            </span>{" "}
+            in Seconds
           </h1>
           <p className="text-xl text-muted-foreground max-w-xl mx-auto">
-            AI-powered study plans tailored to your time and level
+            AI-powered study schedule generator tailored to your topic, timeframe, and learning intensity
           </p>
         </div>
 
