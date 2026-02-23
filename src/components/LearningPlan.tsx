@@ -91,14 +91,17 @@ export const LearningPlan = ({ plan, onToggleResource, onReset }: LearningPlanPr
       <div className="container max-w-4xl px-4 py-8 space-y-8">
         {/* Plan Details */}
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-            <h2 className="text-2xl font-bold text-foreground">{plan.topic}</h2>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-              {plan.level.charAt(0).toUpperCase() + plan.level.slice(1)}
-            </span>
-            <span className="text-xs">
-              {plan.hoursPerWeek} hrs/week • {plan.weeks} weeks
-            </span>
+          <div>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Your learning plan for</p>
+            <h2 className="text-3xl font-bold text-foreground capitalize">{plan.topic}</h2>
+            <div className="flex items-center gap-3 mt-2">
+              <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                {plan.level.charAt(0).toUpperCase() + plan.level.slice(1)}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {plan.hoursPerWeek} hrs/week • {plan.weeks} weeks
+              </span>
+            </div>
           </div>
 
           {/* Action Buttons */}
