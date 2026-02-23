@@ -6,7 +6,7 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, Clock, ArrowRight, Trash2, Loader2 } from "lucide-react";
+import { BookOpen, Clock, ArrowRight, Trash2, Loader2, Home } from "lucide-react";
 import { toast } from "sonner";
 
 interface SavedPlan {
@@ -167,9 +167,12 @@ const Profile = () => {
               Track your progress across all your learning plans
             </p>
           </div>
-          <Button variant="outline" onClick={() => navigate("/")} className="gap-2">
-            <ArrowRight className="h-4 w-4 rotate-180" />
-            Return to Homepage
+          <Button
+            onClick={() => navigate("/")}
+            className="gap-2 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground border-0 rounded-full px-5 py-2 transition-all duration-300 shadow-sm hover:shadow-md"
+          >
+            <Home className="h-4 w-4" />
+            Homepage
           </Button>
         </div>
 
