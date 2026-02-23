@@ -1,102 +1,50 @@
 
-# Credits System for InfinUp
 
-## Overview
-Add a pay-as-you-go credits system where users get a few free credits to start, then purchase credit packs to generate more learning plans. Each plan generation costs 1 credit.
+# SEO Optimization for Infinup.ai
 
-## How It Works
+## What We'll Do
 
-1. **New users** get 3 free credits when they sign up
-2. **Each learning plan** costs 1 credit to generate
-3. Users can **buy credit packs** via Stripe (e.g., 5 credits for $4.99, 15 for $9.99, 50 for $24.99)
-4. Credit balance is shown in the header and on the profile page
-5. If a user has 0 credits, they see an "out of credits" prompt with a buy button instead of the generate form
+Improve your site's visibility in search engines and social media shares by adding proper metadata, structured data, a sitemap, and an OG image.
 
-## What Gets Built
+## Changes
 
-### Database Changes
-- New `user_credits` table tracking each user's balance
-- New `credit_transactions` table logging purchases and usage (audit trail)
-- Database trigger to give 3 free credits on signup
-- RLS policies so users can only see their own credits
+### 1. Complete Meta Tags in `index.html`
+- Add missing `og:url`, `og:image`, `og:site_name` tags
+- Add `twitter:title`, `twitter:description`, `twitter:image` tags
+- Add canonical URL link
+- Add `theme-color` meta tag
+- Add apple-touch-icon link
 
-### Stripe Integration
-- Connect Stripe for payment processing
-- New edge function to create Stripe checkout sessions for credit packs
-- New edge function (webhook) to handle successful payments and add credits
-- Pricing tiers: 5 / 15 / 50 credit packs
+### 2. Create `public/sitemap.xml`
+- Static sitemap listing the main routes (`/`, `/auth`, `/credits`)
+- Reference the published URL (`https://infinup-ai-guide.lovable.app`)
 
-### Frontend Changes
-- **Header**: Show credit balance badge next to the user avatar
-- **LearningForm**: Check credits before generating; show "Buy Credits" prompt if balance is 0
-- **New Credits Page** (`/credits`): Display balance, purchase history, and buy buttons
-- **Profile Page**: Show credit balance in the stats section
+### 3. Update `public/robots.txt`
+- Add `Sitemap:` directive pointing to the sitemap
+- Simplify to a single `User-agent: *` rule
 
-### Plan Generation Update
-- Before generating a plan, check the user's credit balance
-- Deduct 1 credit on successful generation
-- If not enough credits, block generation and prompt to buy more
+### 4. Add JSON-LD Structured Data
+- Add `WebApplication` schema markup in `index.html` so search engines understand this is an AI learning tool
+- Includes name, description, application category, and offers info
 
-## Pricing Tiers
-
-| Pack | Credits | Price | Per Credit |
-|------|---------|-------|------------|
-| Starter | 5 | $4.99 | $1.00 |
-| Popular | 15 | $9.99 | $0.67 |
-| Power | 50 | $24.99 | $0.50 |
+### 5. Create a Simple OG Image
+- Add a branded `public/og-image.svg` (SVG with gradient background, app name, and tagline) for social sharing previews
 
 ## Technical Details
 
-### New Tables
+**`index.html`** -- Add ~20 lines of meta tags + a JSON-LD script block:
+- `<link rel="canonical" href="https://infinup-ai-guide.lovable.app/" />`
+- `<meta property="og:url" content="https://infinup-ai-guide.lovable.app/" />`
+- `<meta property="og:image" content="https://infinup-ai-guide.lovable.app/og-image.svg" />`
+- `<meta property="og:site_name" content="Infinup.ai" />`
+- Twitter meta tags mirroring OG tags
+- JSON-LD `WebApplication` schema in a `<script type="application/ld+json">` block
 
-```text
-user_credits
------------
-id (uuid, PK)
-user_id (uuid, NOT NULL, UNIQUE)
-balance (integer, NOT NULL, DEFAULT 0)
-created_at (timestamptz)
-updated_at (timestamptz)
+**`public/sitemap.xml`** -- New file with standard XML sitemap format
 
-credit_transactions
--------------------
-id (uuid, PK)
-user_id (uuid, NOT NULL)
-amount (integer) -- positive = purchase, negative = usage
-type (text) -- 'purchase', 'usage', 'bonus'
-description (text)
-stripe_session_id (text, nullable)
-created_at (timestamptz)
-```
+**`public/robots.txt`** -- Simplified with sitemap reference
 
-### Edge Functions
-- `create-checkout` -- Creates a Stripe checkout session for a credit pack
-- `stripe-webhook` -- Handles Stripe payment confirmation, adds credits to user balance
+**`public/og-image.svg`** -- New branded SVG for social sharing
 
-### Flow
+No backend changes or new dependencies required.
 
-```text
-User clicks "Buy 15 Credits"
-  --> create-checkout edge function
-  --> Stripe Checkout page
-  --> User pays
-  --> Stripe webhook fires
-  --> stripe-webhook edge function
-  --> Adds 15 credits to user_credits
-  --> Logs transaction in credit_transactions
-  --> User returns to app, sees updated balance
-```
-
-### Credit Check on Plan Generation
-- The `generate-learning-plan` edge function (or client-side before calling it) checks `user_credits.balance > 0`
-- On success, deducts 1 credit and logs a transaction
-- Non-logged-in users can still generate plans freely (or you can require login -- your call)
-
-## Steps to Implement
-
-1. Enable Stripe integration (you'll need your Stripe secret key)
-2. Create database tables and triggers
-3. Build the checkout and webhook edge functions
-4. Add credit balance display to header and profile
-5. Add credit check to plan generation flow
-6. Build the credits/pricing page
