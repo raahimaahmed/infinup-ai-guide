@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useCredits } from "@/hooks/useCredits";
 import { Button } from "@/components/ui/button";
-import { LogIn, LogOut, User } from "lucide-react";
+import { LogIn, LogOut, User, Coins } from "lucide-react";
 import logo from "@/assets/logo.webp";
 
 interface HeaderProps {
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 export const Header = ({ progress }: HeaderProps) => {
   const { user, signOut } = useAuth();
+  const { balance } = useCredits();
   const navigate = useNavigate();
   const percentage = progress ? Math.round((progress.completed / progress.total) * 100) : 0;
 
@@ -43,6 +45,15 @@ export const Header = ({ progress }: HeaderProps) => {
 
           {user ? (
             <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/credits")}
+                className="gap-1.5"
+              >
+                <Coins className="h-4 w-4" />
+                <span className="font-semibold">{balance ?? 0}</span>
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"

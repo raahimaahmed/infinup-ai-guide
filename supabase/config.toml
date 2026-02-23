@@ -8,3 +8,12 @@ verify_jwt = false
 
 [functions.fetch-content]
 verify_jwt = false
+
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.submit-feedback]
+verify_jwt = false
