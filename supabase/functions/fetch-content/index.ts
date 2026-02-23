@@ -1,25 +1,19 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Readability } from "npm:@mozilla/readability@0.5.0";
-import { JSDOM } from "npm:jsdom@24.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 interface FetchContentRequest {
   url: string;
-  extractContent?: boolean; // If true, extract readable content with Readability
+  extractContent?: boolean;
 }
 
 /**
- * Content Fetching & Extraction API
- *
- * Safely fetches external content and optionally extracts readable text
- * using Mozilla's Readability.js to bypass CORS and get clean content
+ * Content Fetching & Extraction API using Firecrawl
  */
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -27,7 +21,6 @@ serve(async (req) => {
   try {
     const { url, extractContent = true } = await req.json() as FetchContentRequest;
 
-    // Validate URL
     if (!url || !url.startsWith('http')) {
       return new Response(
         JSON.stringify({ error: 'Invalid URL. Must start with http:// or https://' }),
@@ -35,10 +28,8 @@ serve(async (req) => {
       );
     }
 
-    // Security: Block potentially dangerous URLs
-    const blockedDomains = ['localhost', '127.0.0.1', '0.0.0.0', 'file://', 'data:'];
+    const blockedDomains = ['localhost', '127.0.0.1', '0.0.0.0'];
     const urlObj = new URL(url);
-
     if (blockedDomains.some(domain => urlObj.hostname.includes(domain))) {
       return new Response(
         JSON.stringify({ error: 'URL is blocked for security reasons' }),
@@ -46,101 +37,70 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Fetching content from: ${url}`);
+    const apiKey = Deno.env.get('FIRECRAWL_API_KEY');
+    if (!apiKey) {
+      return new Response(
+        JSON.stringify({ error: 'Firecrawl API key not configured', success: false }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // Fetch the content
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    console.log(`Fetching content from: ${url} using Firecrawl`);
 
-    const response = await fetch(url, {
-      signal: controller.signal,
+    const response = await fetch('https://api.firecrawl.dev/v1/scrape', {
+      method: 'POST',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; InfinUp/1.0; +https://infinup.ai)',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        url,
+        formats: ['markdown', 'html'],
+        onlyMainContent: true,
+      }),
     });
 
-    clearTimeout(timeoutId);
+    const data = await response.json();
 
-    if (!response.ok) {
+    if (!response.ok || !data.success) {
+      console.error('Firecrawl error:', data);
       return new Response(
         JSON.stringify({
-          error: `Failed to fetch content: HTTP ${response.status}`,
-          status: response.status
+          error: data.error || `Failed to fetch content: HTTP ${response.status}`,
+          success: false,
         }),
         { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const html = await response.text();
+    const content = data.data;
+    const metadata = content?.metadata || {};
+    const markdown = content?.markdown || '';
+    const html = content?.html || '';
 
-    // If content extraction requested, use Readability
-    if (extractContent) {
-      try {
-        const dom = new JSDOM(html, { url });
-        const reader = new Readability(dom.window.document);
-        const article = reader.parse();
+    console.log(`Successfully extracted: ${metadata.title || 'Untitled'}`);
 
-        if (!article) {
-          return new Response(
-            JSON.stringify({
-              error: 'Could not extract readable content',
-              rawHtml: html.slice(0, 5000) // Return first 5KB as fallback
-            }),
-            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-
-        console.log(`Successfully extracted article: ${article.title}`);
-
-        return new Response(
-          JSON.stringify({
-            title: article.title,
-            byline: article.byline,
-            content: article.content,
-            textContent: article.textContent,
-            length: article.length,
-            excerpt: article.excerpt,
-            siteName: article.siteName,
-            url: url,
-            success: true
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-
-      } catch (readabilityError) {
-        console.error('Readability extraction failed:', readabilityError);
-
-        return new Response(
-          JSON.stringify({
-            error: 'Failed to parse content',
-            rawHtml: html.slice(0, 5000),
-            success: false
-          }),
-          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-    }
-
-    // Return raw HTML if extraction not requested
     return new Response(
       JSON.stringify({
-        rawHtml: html,
-        url: url,
-        success: true
+        title: metadata.title || '',
+        byline: metadata.author || metadata.ogAuthor || '',
+        content: html,
+        textContent: markdown,
+        length: markdown.length,
+        excerpt: metadata.description || markdown.slice(0, 200),
+        siteName: metadata.ogSiteName || metadata.sourceURL || '',
+        url,
+        success: true,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error in fetch-content:', error);
-
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
     return new Response(
       JSON.stringify({
-        error: errorMessage,
-        success: false
+        error: error instanceof Error ? error.message : 'Unknown error',
+        success: false,
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

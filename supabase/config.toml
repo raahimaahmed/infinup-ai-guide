@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.send-learning-plan]
 verify_jwt = false
+
+[functions.fetch-content]
+verify_jwt = false
