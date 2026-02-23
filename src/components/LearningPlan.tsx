@@ -148,8 +148,7 @@ export const LearningPlan = ({ plan, onToggleResource, onReset }: LearningPlanPr
         )}
       </div>
 
-      {/* Floating Feedback Button */}
-      <FeedbackSection />
+    
     </div>
   );
 };
